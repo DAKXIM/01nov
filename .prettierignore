@@ -1,4 +1,6 @@
-.cache
-package.json
-package-lock.json
+dist
+node_modules
 public
+.cache
+WordPress
+.yarn

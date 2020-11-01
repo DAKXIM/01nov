@@ -1,44 +1,77 @@
 {
-  "name": "gatsby-starter-default",
+  "name": "gatsby-wordpress-workspace",
   "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
-  "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
-  "dependencies": {
-    "gatsby": "^2.24.91",
-    "gatsby-image": "^2.4.21",
-    "gatsby-plugin-manifest": "^2.4.37",
-    "gatsby-plugin-offline": "^3.2.38",
-    "gatsby-plugin-react-helmet": "^3.3.14",
-    "gatsby-plugin-sharp": "^2.6.43",
-    "gatsby-source-filesystem": "^2.3.37",
-    "gatsby-transformer-sharp": "^2.5.20",
-    "prop-types": "^15.7.2",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-helmet": "^6.1.0"
+  "version": "0.0.1",
+  "license": "MIT",
+  "workspaces": [
+    "test-site",
+    "plugin"
+  ],
+  "scripts": {
+    "prettier": "prettier . --write",
+    "eslint": "eslint . --ext .ts,.js,.jsx,.tsx",
+    "prettier-check": "prettier . --check",
+    "lint": "yarn prettier-check && yarn eslint",
+    "build": "yarn workspace gatsby-source-wordpress-experimental run build",
+    "clean-test-runtime": "cd test-site && gatsby clean",
+    "develop-test-runtime": "cd test-site && yarn develop",
+    "build-test-runtime": "cd test-site && yarn build",
+    "serve-test-runtime": "cd test-site && yarn serve",
+    "ci-test": "server-test 'yarn docker-start' http://localhost:8001",
+    "ci": "yarn lint && yarn ci-test",
+    "docker-start": "docker-compose up --build --force-recreate -V",
+    "test-schema-first": "START_SERVER=true jest ./test-site/__tests__/integration/schema",
+    "test-schema-increment": "WPGQL_INCREMENT=true START_SERVER=true jest ./test-site/__tests__/integration/schema",
+    "test-schema": "yarn clean-test-runtime && yarn test-schema-first && yarn test-schema-increment",
+    "test-build": "yarn clean-test-runtime && DEFAULT_PLUGIN_OPTIONS=true jest ./test-site/__tests__/integration/build",
+    "test": "yarn build && yarn test-schema && yarn test-build && yarn clean-test-runtime",
+    "test-schema-watch": "SHOW_GATSBY_PROCESS_STDOUT=true yarn test-schema-first --watch",
+    "test-build-watch": "SHOW_GATSBY_PROCESS_STDOUT=true yarn test-build --watch",
+    "test-update": "yarn test-schema-first -u && yarn test-schema-increment -u && yarn test-build -u",
+    "npm-publish": "yarn run lint && yarn test && cp README.md plugin/README.md && cd plugin && npm publish"
   },
   "devDependencies": {
-    "prettier": "2.1.2"
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/plugin-proposal-private-methods": "^7.10.1",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "@typescript-eslint/parser": "^4.5.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^25.1.0",
+    "babel-plugin-import-globals": "^2.0.0",
+    "babel-plugin-root-import": "^6.4.1",
+    "babel-preset-gatsby": "^0.2.29",
+    "babel-preset-gatsby-package": "^0.2.9",
+    "cross-env": "^5.2.1",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^6.14.0",
+    "eslint-plugin-filenames": "^1.3.2",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.3.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^25.1.0",
+    "lint-staged": "^10.4.2",
+    "prettier": "^2.1.2",
+    "react-test-renderer": "^16.12.0",
+    "rimraf": "^3.0.2",
+    "start-server-and-test": "^1.11.5",
+    "tree-kill": "^1.2.2",
+    "typescript": "^4.0.3",
+    "wait-on": "^4.0.0"
   },
-  "keywords": [
-    "gatsby"
-  ],
-  "license": "0BSD",
-  "scripts": {
-    "build": "gatsby build",
-    "develop": "gatsby develop",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "start": "npm run develop",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
-  },
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint",
+      "prettier --write"
+    ],
+    "*.{md,json,yml}": [
+      "prettier --write"
+    ]
   }
 }
